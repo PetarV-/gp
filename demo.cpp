@@ -24,7 +24,7 @@ int main()
 
 	// points to be used to plot lines
 	vector<double> xs;
-	for (double x=-5.0;x<=5.0;x+=0.01) xs.push_back(x);
+	for (double x=-1.0;x<=1.0;x+=0.001) xs.push_back(x);
 
 	// Sample the prior
 	vector<double> mu = gp.get_means(xs);

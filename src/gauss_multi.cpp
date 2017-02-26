@@ -15,19 +15,21 @@ MultiGaussian::MultiGaussian(default_random_engine gen, vector<double> mu, vecto
 	assert(mu.size() == Sigma.size());
 	assert(Sigma.size() == Sigma[0].size());
 
-	// Cholesky-decompose Sigma = A * A^T
-	A = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
+	// LDL^T-decompose Sigma = L * D * L^T
+	L = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
+	D = vector<double>(mu.size(), 0.0);
 
 	for (uint i=0;i<mu.size();i++)
 	{
-		for (uint j=0;j<i+1;j++)
+		for (int j=i;j>=0;j--)
 		{
 			double s = 0.0;
-			for (uint k=0;k<j;k++)
+			for (int k=0;k<j;k++)
 			{
-				s += A[i][k] * A[j][k];
+				s += L[i][k] * L[j][k] * D[k];
 			}
-			A[i][j] = (i == j) ? sqrt(Sigma[i][i] - s) : (1.0 / A[j][j] * (Sigma[i][j] - s));
+			if (i == (uint)j) D[j] = Sigma[j][j] - s;
+			L[i][j] = (Sigma[i][j] - s) / D[j];
 		}
 	}
 }
@@ -46,7 +48,7 @@ vector<double> MultiGaussian::sample()
 	vector<double> ret(mu.size());
 	for (uint i=0;i<mu.size();i++)
 	{
-		ret[i] = mu[i] + inner_product(A[i].begin(), A[i].end(), z.begin(), 0.0);
+		ret[i] = mu[i] + sqrt(D[i]) * inner_product(L[i].begin(), L[i].end(), z.begin(), 0.0);
 	}
 
 	return ret;

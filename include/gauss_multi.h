@@ -29,7 +29,8 @@ private:
 
 	// mean vector and decomposed covariance matrix
 	std::vector<double> mu;
-	std::vector<std::vector<double>> A;
+	std::vector<std::vector<double>> L;
+	std::vector<double> D;
 
 public:
 	// Create a new multivariate distribution N(mu, Sigma), with engine gen
