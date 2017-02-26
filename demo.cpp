@@ -34,7 +34,7 @@ void to_tikz(vector<vector<double>> X, vector<vector<double>> Y, string fname)
 	fprintf(f, "\\begin{tikzpicture}[very thick]\n");
 	// Begin axis (with all parameters)
 	fprintf(f, "\\begin{axis}[width=6.028in, height=4.754in,\n");
-	fprintf(f, "scale only axis, xmin=-1, xmax=1, ymin=-100.0, ymax=100.0,\n");
+	fprintf(f, "scale only axis, xmin=-1, xmax=1, ymin=-5.0, ymax=5.0,\n");
 	fprintf(f, "axis background/.style={fill=white}]\n");
 
 	// Add plots
@@ -60,7 +60,7 @@ int main()
 	// Create a new Gaussian process... 
 	// use zero-mean, squared-exponential covariance (hyperparam l = 1.0), no noise.
 	auto m = [](double) { return 0; };
-	auto k = [](double x, double y) { return exp(-(x - y) * (x - y) / (2.0 * 10.0 * 10.0)); };
+	auto k = [](double x, double y) { return exp(-(x - y) * (x - y) / (2.0 * 1.0)); };
 	GP gp(m, k, 0.0);
 
 	// points to be used to plot lines
@@ -70,6 +70,15 @@ int main()
 	// Sample the prior
 	vector<double> mu = gp.get_means(xs);
 	vector<vector<double>> Sigma = gp.get_covar(xs);
+
+	/*for (uint i=0;i<Sigma.size();i++)
+	{
+		for (uint j=0;j<Sigma.size();j++)
+		{
+			printf("%.2lf ", Sigma[i][j]);
+		}
+		printf("\n");
+	}*/
 
 	MultiGaussian N(gen, mu, Sigma);
 

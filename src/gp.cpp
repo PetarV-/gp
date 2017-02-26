@@ -125,8 +125,8 @@ vector<vector<double>> GP::get_covar(vector<double> xs)
 		}
 	}
 
-	vector<vector<double>> lhs(xs.size(), vector<double>(n));
-	vector<vector<double>> rhs(xs.size(), vector<double>(n));
+	vector<vector<double>> lhs(xs.size(), vector<double>(n, 0.0));
+	vector<vector<double>> rhs(xs.size(), vector<double>(n, 0.0));
 	for (uint i=0;i<xs.size();i++)
 	{
 		for (int j=0;j<n;j++)

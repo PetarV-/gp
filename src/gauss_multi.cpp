@@ -16,22 +16,36 @@ MultiGaussian::MultiGaussian(default_random_engine gen, vector<double> mu, vecto
 	assert(Sigma.size() == Sigma[0].size());
 
 	// LDL^T-decompose Sigma = L * D * L^T
-	L = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
-	D = vector<double>(mu.size(), 0.0);
+	auto L = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
+	auto D = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
+
+	C = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
+
+	for (uint j=0;j<mu.size();j++)
+	{
+		for (uint i=j;i<mu.size();i++)
+		{
+			double s = 0.0;
+			for (uint k=0;k<j;k++)
+			{
+				s += L[i][k] * L[j][k] * D[k][k];
+			}
+			if (i == j) D[j][j] = sqrt(Sigma[j][j] - s);
+			L[i][j] = (Sigma[i][j] - s) / D[j][j];
+		}
+	}
 
 	for (uint i=0;i<mu.size();i++)
 	{
-		for (int j=i;j>=0;j--)
+		for (uint j=0;j<mu.size();j++)
 		{
-			double s = 0.0;
-			for (int k=0;k<j;k++)
-			{
-				s += L[i][k] * L[j][k] * D[k];
-			}
-			if (i == (uint)j) D[j] = Sigma[j][j] - s;
-			L[i][j] = (Sigma[i][j] - s) / D[j];
+			C[i][j] = inner_product(L[i].begin(), L[i].end(), D[j].begin(), 0.0);
+	//		printf("%.2lf ", L[i][j]);
 		}
+	//	printf("\n");
 	}
+
+
 }
 
 vector<double> MultiGaussian::sample()
@@ -48,7 +62,7 @@ vector<double> MultiGaussian::sample()
 	vector<double> ret(mu.size());
 	for (uint i=0;i<mu.size();i++)
 	{
-		ret[i] = mu[i] + sqrt(D[i]) * inner_product(L[i].begin(), L[i].end(), z.begin(), 0.0);
+		ret[i] = mu[i] + inner_product(C[i].begin(), C[i].end(), z.begin(), 0.0);
 	}
 
 	return ret;
