@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <gauss_multi.h>
+#define EPS 1e-5
 
 using namespace std;
 typedef unsigned int uint;
@@ -15,11 +16,8 @@ MultiGaussian::MultiGaussian(default_random_engine gen, vector<double> mu, vecto
 	assert(mu.size() == Sigma.size());
 	assert(Sigma.size() == Sigma[0].size());
 
-	// LDL^T-decompose Sigma = L * D * L^T
-	auto L = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
-	auto D = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
-
-	C = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
+	// Cholesky-decompose Sigma = LL^T
+	L = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
 
 	for (uint j=0;j<mu.size();j++)
 	{
@@ -28,24 +26,12 @@ MultiGaussian::MultiGaussian(default_random_engine gen, vector<double> mu, vecto
 			double s = 0.0;
 			for (uint k=0;k<j;k++)
 			{
-				s += L[i][k] * L[j][k] * D[k][k];
+				s += L[i][k] * L[j][k];
 			}
-			if (i == j) D[j][j] = sqrt(Sigma[j][j] - s);
-			L[i][j] = (Sigma[i][j] - s) / D[j][j];
+			if (i == j) L[j][j] = sqrt(Sigma[j][j] + EPS - s);
+			else { L[i][j] = (Sigma[i][j] - s) / L[j][j]; }
 		}
 	}
-
-	for (uint i=0;i<mu.size();i++)
-	{
-		for (uint j=0;j<mu.size();j++)
-		{
-			C[i][j] = inner_product(L[i].begin(), L[i].end(), D[j].begin(), 0.0);
-	//		printf("%.2lf ", L[i][j]);
-		}
-	//	printf("\n");
-	}
-
-
 }
 
 vector<double> MultiGaussian::sample()
@@ -62,7 +48,7 @@ vector<double> MultiGaussian::sample()
 	vector<double> ret(mu.size());
 	for (uint i=0;i<mu.size();i++)
 	{
-		ret[i] = mu[i] + inner_product(C[i].begin(), C[i].end(), z.begin(), 0.0);
+		ret[i] = mu[i] + inner_product(L[i].begin(), L[i].end(), z.begin(), 0.0);
 	}
 
 	return ret;

@@ -34,14 +34,14 @@ void to_tikz(vector<vector<double>> X, vector<vector<double>> Y, string fname)
 	fprintf(f, "\\begin{tikzpicture}[very thick]\n");
 	// Begin axis (with all parameters)
 	fprintf(f, "\\begin{axis}[very thick, width=6.028in, height=4.754in,\n");
-	fprintf(f, "scale only axis, xmin=-5, xmax=5, ymin=-2, ymax=2,\n");
+	fprintf(f, "scale only axis, xmin=-5, xmax=5, ymin=-5, ymax=5,\n");
 	fprintf(f, "axis background/.style={fill=white}]\n");
 
 	// Add plots
 	for (uint i=0;i<X.size();i++)
 	{
 		assert(X[i].size() == Y[i].size());
-		fprintf(f, "\\addplot[color=mycolor%d, solid, smooth] table[row sep=crcr]{%%\n", i);
+		fprintf(f, "\\addplot[color=mycolor%d, solid] table[row sep=crcr]{%%\n", i);
 		for (uint j=0;j<X[i].size();j++)
 		{
 			fprintf(f, "%.10lf %.10lf\\\\\n", X[i][j], Y[i][j]);
@@ -58,27 +58,23 @@ void to_tikz(vector<vector<double>> X, vector<vector<double>> Y, string fname)
 int main()
 {
 	// Create a new Gaussian process... 
-	// use zero-mean, squared-exponential covariance (hyperparam l = 0.5), no noise.
+	// use zero-mean, squared-exponential covariance (hyperparam l = 0.75), no noise.
 	auto m = [](double) { return 0; };
-	auto k = [](double x, double y) { return exp(-(x - y) * (x - y) / (2.0 * 0.5 * 0.5)); };
+	auto k = [](double x, double y) { return exp(-(x - y) * (x - y) / (2.0 * 0.75 * 0.75)); };
 	GP gp(m, k, 0.0);
+
+	gp.push(-3.0, 0.0);
+	//gp.push(0.0, 1.0);
+	//gp.push(2.0, -1.0);
+	//gp.push(4.0, 2.0);
 
 	// points to be used to plot lines
 	vector<double> xs;
-	for (double x=-5.0;x<=5.0;x+=0.02) xs.push_back(x);
+	for (double x=-5.0;x<=5.0;x+=0.01) xs.push_back(x);
 
 	// Sample the prior
 	vector<double> mu = gp.get_means(xs);
 	vector<vector<double>> Sigma = gp.get_covar(xs);
-
-	/*for (uint i=0;i<Sigma.size();i++)
-	{
-		for (uint j=0;j<Sigma.size();j++)
-		{
-			printf("%.2lf ", Sigma[i][j]);
-		}
-		printf("\n");
-	}*/
 
 	MultiGaussian N(gen, mu, Sigma);
 

@@ -125,6 +125,7 @@ vector<vector<double>> GP::get_covar(vector<double> xs)
 		}
 	}
 
+	// |X * Xt| |Xt * Xt| |Xt * X|
 	vector<vector<double>> lhs(xs.size(), vector<double>(n, 0.0));
 	vector<vector<double>> rhs(xs.size(), vector<double>(n, 0.0));
 	for (uint i=0;i<xs.size();i++)
@@ -139,7 +140,7 @@ vector<vector<double>> GP::get_covar(vector<double> xs)
 	{
 		for (uint j=0;j<xs.size();j++)
 		{
-			rhs[j][i] = inner_product(L[i].begin(), L[i].end(), lhs[i].begin(), 0.0);
+			rhs[j][i] = inner_product(L[i].begin(), L[i].end(), lhs[j].begin(), 0.0);
 		}
 	}
 
@@ -147,7 +148,7 @@ vector<vector<double>> GP::get_covar(vector<double> xs)
 	{
 		for (uint j=0;j<xs.size();j++)
 		{
-			ret[i][j] -= inner_product(lhs[i].begin(), lhs[i].end(), rhs[i].begin(), 0.0);
+			ret[i][j] -= inner_product(lhs[i].begin(), lhs[i].end(), rhs[j].begin(), 0.0);
 		}
 	}
 
