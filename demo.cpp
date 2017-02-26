@@ -41,7 +41,7 @@ void to_tikz(vector<vector<double>> X, vector<vector<double>> Y, vector<vector<d
 
 		// plot mean function
 	assert(Xmss[0].size() == mss[0].size());
-	fprintf(f, "\\addplot[color=black, solid] table[row sep=crcr]{%%\n");
+	fprintf(f, "\\addplot[color=black, very thick, solid] table[row sep=crcr]{%%\n");
 	for (uint j=0;j<Xmss[0].size();j++)
 	{
 		fprintf(f, "%.10lf %.10lf\\\\\n", Xmss[0][j], mss[0][j]);
@@ -66,13 +66,13 @@ void to_tikz(vector<vector<double>> X, vector<vector<double>> Y, vector<vector<d
 	fprintf(f, "};\n");
 
 	// fill in between
-	fprintf(f, "\\addplot[gray] fill between[of=F and G];\n");
+	fprintf(f, "\\addplot[lightgray] fill between[of=F and G];\n");
 
 	// Add plots
 	for (uint i=0;i<X.size();i++)
 	{
 		assert(X[i].size() == Y[i].size());
-		fprintf(f, "\\addplot[color=mycolor%d, solid] table[row sep=crcr]{%%\n", i);
+		fprintf(f, "\\addplot[color=mycolor%d, very thick, solid] table[row sep=crcr]{%%\n", i);
 		for (uint j=0;j<X[i].size();j++)
 		{
 			fprintf(f, "%.10lf %.10lf\\\\\n", X[i][j], Y[i][j]);
