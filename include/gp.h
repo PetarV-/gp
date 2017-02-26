@@ -27,10 +27,10 @@ private:
 	int n;
 
 	// current training set
-	vector<double> xt, yt;
+	std::vector<double> xt, yt;
 
 	// current inverse gram matrix
-	vector<vector<double>> L;
+	std::vector<std::vector<double>> L;
 
 public:
 	// Create a new GP with given mean and covariance function, and noise parameter
@@ -40,10 +40,10 @@ public:
 	void push(double x, double y);
 
 	// Get the mean values at given points
-	vector<double> get_means(vector<double> xs);
+	std::vector<double> get_means(std::vector<double> xs);
 
 	// Get the covariances at all pairs of given points
-	vector<vector<double>> get_covar(vector<double> xs);
+	std::vector<std::vector<double>> get_covar(std::vector<double> xs);
 };
 
 #endif
