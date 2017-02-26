@@ -4,7 +4,10 @@
 #include <random>
 #include <vector>
 
+#include <gauss_multi.h>
+
 using namespace std;
+typedef unsigned int uint;
 
 MultiGaussian::MultiGaussian(default_random_engine gen, vector<double> mu, vector<vector<double>> Sigma) : gen(gen), mu(mu)
 {
@@ -15,12 +18,12 @@ MultiGaussian::MultiGaussian(default_random_engine gen, vector<double> mu, vecto
 	// Cholesky-decompose Sigma = A * A^T
 	A = vector<vector<double>>(mu.size(), vector<double>(mu.size(), 0.0));
 
-	for (int i=0;i<mu.size();i++)
+	for (uint i=0;i<mu.size();i++)
 	{
-		for (int j=0;j<i+1;j++)
+		for (uint j=0;j<i+1;j++)
 		{
 			double s = 0.0;
-			for (int k=0;k<j;k++)
+			for (uint k=0;k<j;k++)
 			{
 				s += A[i][k] * A[j][k];
 			}
@@ -35,15 +38,15 @@ vector<double> MultiGaussian::sample()
 
 	// Compute mu + A * z, where z ~ N(0, I)
 	vector<double> z(mu.size());
-	for (int i=0;i<mu.size();i++)
+	for (uint i=0;i<mu.size();i++)
 	{
 		z[i] = N(gen);
 	}
 
 	vector<double> ret(mu.size());
-	for (int i=0;i<mu.size();i++)
+	for (uint i=0;i<mu.size();i++)
 	{
-		ret[i] = mu[i] + inner_product(A[i].begin(), A[i].end(), z.begin());
+		ret[i] = mu[i] + inner_product(A[i].begin(), A[i].end(), z.begin(), 0.0);
 	}
 
 	return ret;

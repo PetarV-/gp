@@ -5,8 +5,7 @@
 #include <gp.h>
 
 using namespace std;
-
-default_random_engine gen;
+typedef unsigned int uint;
 
 GP::GP(function<double(double)> m, function<double(double, double)> k, double sigma) : m(m), k(k), sigma(sigma), n(0) { } 
 
@@ -34,7 +33,7 @@ void GP::push(double x, double y)
 		// Now compute a' = 1/(a - b^T * L * b)
 		for (int i=0;i<n;i++)
 		{
-			a -= b[i] * inner_product(L[i].begin(), L[i].end(), b.begin());
+			a -= b[i] * inner_product(L[i].begin(), L[i].end(), b.begin(), 0.0);
 		}
 		a = 1.0 / a;
 
@@ -54,12 +53,12 @@ void GP::push(double x, double y)
 		{
 			vector<double> ti(n);
 			for (int j=0;j<n;j++) ti[j] = L[j][i];
-			Lp[0][i + 1] = -a * inner_product(b.begin(), b.end(), ti.begin());
+			Lp[0][i + 1] = -a * inner_product(b.begin(), b.end(), ti.begin(), 0.0);
 		}
 
 		for (int i=0;i<n;i++)
 		{
-			Lp[i + 1][0] = -a * inner_product(L[i].begin(), L[i].end(), b.begin());
+			Lp[i + 1][0] = -a * inner_product(L[i].begin(), L[i].end(), b.begin(), 0.0);
 		}
 
 		vector<double> lhs(n);
@@ -67,13 +66,13 @@ void GP::push(double x, double y)
 
 		for (int i=0;i<n;i++)
 		{
-			lhs[i] = inner_product(L[i].begin(), L[i].end(), b.begin());
+			lhs[i] = inner_product(L[i].begin(), L[i].end(), b.begin(), 0.0);
 		}
 		for (int i=0;i<n;i++)
 		{
 			vector<double> ti(n);
 			for (int j=0;j<n;j++) ti[j] = L[j][i];
-			rhs[i] = inner_product(b.begin(), b.end(), ti.begin());
+			rhs[i] = inner_product(b.begin(), b.end(), ti.begin(), 0.0);
 		}
 
 		for (int i=0;i<n;i++)
@@ -92,21 +91,21 @@ void GP::push(double x, double y)
 	n++;
 }
 
-vector<double> GP::get_mean(vector<double> xs)
+vector<double> GP::get_means(vector<double> xs)
 {
 	vector<double> ret(xs.size());
 
 	// Compute mean(x) + k^T * L * y
-	for (int i=0;i<xs.size();i++)
+	for (uint i=0;i<xs.size();i++)
 	{
 		ret[i] = m(xs[i]);
 	}
 
-	for (int i=0;i<xs.size();i++)
+	for (uint i=0;i<xs.size();i++)
 	{
 		for (int j=0;j<n;j++)
 		{
-			ret[i] += k(xs[i], xt[j]) * inner_product(L[j].begin(), L[j].end(), yt.begin());
+			ret[i] += k(xs[i], xt[j]) * inner_product(L[j].begin(), L[j].end(), yt.begin(), 0.0);
 		}
 	}
 
@@ -118,9 +117,9 @@ vector<vector<double>> GP::get_covar(vector<double> xs)
 	vector<vector<double>> ret(xs.size(), vector<double>(xs.size()));
 
 	// Compute k(xs, xs) - k(xs, x) * L * k(x, xs)
-	for (int i=0;i<xs.size();i++)
+	for (uint i=0;i<xs.size();i++)
 	{
-		for (int j=0;j<xs.size();j++)
+		for (uint j=0;j<xs.size();j++)
 		{
 			ret[i][j] = k(xs[i], xs[j]);
 		}
@@ -128,7 +127,7 @@ vector<vector<double>> GP::get_covar(vector<double> xs)
 
 	vector<vector<double>> lhs(xs.size(), vector<double>(n));
 	vector<vector<double>> rhs(xs.size(), vector<double>(n));
-	for (int i=0;i<xs.size();i++)
+	for (uint i=0;i<xs.size();i++)
 	{
 		for (int j=0;j<n;j++)
 		{
@@ -138,17 +137,17 @@ vector<vector<double>> GP::get_covar(vector<double> xs)
 
 	for (int i=0;i<n;i++)
 	{
-		for (int j=0;j<xs.size();j++)
+		for (uint j=0;j<xs.size();j++)
 		{
-			rhs[j][i] = inner_product(L[i].begin(), L[i].end(), lhs[i].begin())
+			rhs[j][i] = inner_product(L[i].begin(), L[i].end(), lhs[i].begin(), 0.0);
 		}
 	}
 
-	for (int i=0;i<xs.size();i++)
+	for (uint i=0;i<xs.size();i++)
 	{
-		for (int j=0;j<xs.size();j++)
+		for (uint j=0;j<xs.size();j++)
 		{
-			ret[i][j] -= inner_product(lhs[i].begin(), lhs[i].end(), rhs[i].begin())
+			ret[i][j] -= inner_product(lhs[i].begin(), lhs[i].end(), rhs[i].begin(), 0.0);
 		}
 	}
 
