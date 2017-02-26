@@ -19,7 +19,7 @@ build/gauss_multi.o : src/gauss_multi.cpp
 
 build/demo.o : demo.cpp
 	$(MKDIR_P) build/
-	$(CC) $(CFLAGS) demo.cpp -o build/demo.cpp
+	$(CC) $(CFLAGS) demo.cpp -o build/demo.o
 
 .PHONY : clean
 clean : 

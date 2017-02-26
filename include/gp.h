@@ -11,6 +11,8 @@
 
 /*
  TODO: Provide a nice description of GPs
+ TODO: Allow multidimensional inputs
+ TODO: Hyperparameter optimisation
 */
 
 class GP
