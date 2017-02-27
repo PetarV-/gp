@@ -94,10 +94,9 @@ int main()
 	auto k = [](double x, double y) { return exp(-(x - y) * (x - y) / (2.0 * 0.75 * 0.75)); };
 	GP gp(m, k, 0.0);
 
+	// Condition it on two points
 	gp.push(-3.0, 4.0);
-	//gp.push(0.0, 1.0);
 	gp.push(2.0, -3.0);
-	//gp.push(4.0, 2.0);
 
 	// points to be used to plot lines
 	vector<double> xs;
