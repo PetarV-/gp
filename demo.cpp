@@ -66,7 +66,7 @@ void to_tikz(vector<vector<double>> X, vector<vector<double>> Y, vector<vector<d
 	fprintf(f, "};\n");
 
 	// fill in between
-	fprintf(f, "\\addplot[lightgray] fill between[of=F and G];\n");
+	fprintf(f, "\\addplot[lightgray!50] fill between[of=F and G];\n");
 
 	// Add plots
 	for (uint i=0;i<X.size();i++)
@@ -94,9 +94,9 @@ int main()
 	auto k = [](double x, double y) { return exp(-(x - y) * (x - y) / (2.0 * 0.75 * 0.75)); };
 	GP gp(m, k, 0.0);
 
-	gp.push(-3.0, 0.0);
+	gp.push(-3.0, 4.0);
 	//gp.push(0.0, 1.0);
-	gp.push(2.0, -1.0);
+	gp.push(2.0, -3.0);
 	//gp.push(4.0, 2.0);
 
 	// points to be used to plot lines
